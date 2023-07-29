@@ -1,20 +1,31 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from "react";
+import { Button, SafeAreaView, View } from "react-native";
+import { mediaDevices, RTCView } from "react-native-webrtc";
 
-export default function App() {
+const App = () => {
+  const [stream, setStream] = useState(null);
+  const start = async () => {
+    if (!stream) {
+      let s;
+      try {
+        s = await mediaDevices.getUserMedia({ video: true });
+        setStream(s);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <SafeAreaView>
+        {stream && <RTCView style={{height: 550, width: '100%'}} zOrder={20} objectFit={"cover"} mirror={true} streamURL={stream.toURL()} />}
+        <View>
+          <Button title="Start" onPress={start} />
+        </View>
+      </SafeAreaView>
+    </>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
